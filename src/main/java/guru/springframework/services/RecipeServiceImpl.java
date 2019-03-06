@@ -59,7 +59,6 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public Mono<RecipeCommand> saveRecipeCommand(RecipeCommand command) {
 
-        Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
 
         return recipeReactiveRepository.save(recipeCommandToRecipe.convert(command))
                 .map(recipeToRecipeCommand::convert);
