@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,6 +24,8 @@ public class RecipeController {
     private static final String RECIPE_RECIPEFORM_URL = "recipe/recipeform";
     private final RecipeService recipeService;
 
+    private WebDataBinder webDataBinder;
+
     public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
     }
@@ -33,6 +36,11 @@ public class RecipeController {
         model.addAttribute("recipe", recipeService.findById(id));
 
         return "recipe/show";
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder webDataBinder){
+        this.webDataBinder =webDataBinder;
     }
 
     @GetMapping("recipe/new")
@@ -49,7 +57,11 @@ public class RecipeController {
     }
 
     @PostMapping("recipe")
-    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand command, BindingResult bindingResult){
+    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand command){
+
+        webDataBinder.validate(); // work around binding didn't take
+
+        BindingResult bindingResult = webDataBinder.getBindingResult(); // manual version
 
         if(bindingResult.hasErrors()){
 
